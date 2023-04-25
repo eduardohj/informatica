@@ -1,0 +1,153 @@
+#####################################################
+#               IA4J configuration
+#####################################################
+
+enableInstrumentation=true
+ia4j.masterThreadInterval=10
+
+#Detach Agent flag Should never be made true unless you want to remove ia4j
+#detachAgent=false
+
+# Prefix for output directory
+# Directory may be specified as part of the prefix
+# On Windows, use double slashes '\\' as delimiter
+# "_date_time_pid<pid>" would be appended to the prefix below
+ia4j.traceFilePrefix=ia4j
+
+
+#################################
+# Debugging
+#################################
+# logging debug message from ia4j
+ia4j.debugMode=true
+
+# logging debug messages from ia4j timer 
+ia4j.timerDebugMode=false
+
+
+################################
+# Remote control features
+################################
+ia4j.remoteControlMode=false
+ia4j.minControlPort=5551
+ia4j.maxControlPort=5600
+
+# If tracing of methods should be started on application startup
+ia4j.traceOnStartup=true
+ia4j.clsldrTrace=false
+
+#################################
+# Track Internal events
+#################################
+
+# Dump all threads from shutdown hook
+ia4j.dumpThreadsOnShutdown=false
+
+# Dump heap from shutdown hook - subjected to maxDumps limit
+ia4j.dumpHeapOnShutdown=false
+
+#Dump threads and heap on enabling command
+ia4j.heapOnDemand=false
+ia4j.threadsOnDemand=false
+
+#################################
+# Output content
+#################################
+
+# Maximum number of total dumps (THREADS,HEAP, CMD) that should be collected 
+ia4j.maxDumps=0
+ia4j.maxHeapDumps=5
+
+#How many levels can the json object dump go (Default and minimum value is 2)
+ia4j.jsonStackCount=2
+
+
+# To use rolling appender for trace ilfe
+# Specify in MB, a new file will be created after current file becomes approx the specified size
+# will write to same file if set it to 0
+ia4j.traceFileMaxSize=0
+
+# !!Experimental!!
+# Creates a smaller trace file reducing redundancy of certain fields in trace file 
+ia4j.traceFileCompress=false
+
+
+# Following to control which argument/return value types to be printed using toString()
+# default contains only java.lang.* (except java.lang.Object)
+# Separate each by "||"
+ia4j.printTypes=java.lang.*||java.net.*Socket||java.net.(URL|URI)||java.util.Date
+
+
+################################
+# Filters for instrumentation
+################################
+
+# Filter specification as <classFilter>[::<methodFilter>]*[~~<event>=><action>]
+# If no <methodFilter> is specified, then it is inferred as all methods
+
+# If any java.*, javax.*, sun.* packages are to be instrumented
+# ia4j.exclude SHOULD be defined (atleast to some dummy package)
+
+#specify each phrase as a separate property by a key that begins with "ia4j.include"
+
+
+#################################
+# Examples of event and actions #
+#################################
+#ia4j.include1=java.lang.*::.*~~ENTRY=>VALUES
+ia4j.include1b=com.compactsolutionsllc.cdimc.app.TestSourceConnectionRunner::getExecutionContext~~ENTRY=>HEAP~~ENTRY=>STACK~~ENTRY=>THREADS
+# traces arguments for entry of matching methods
+#ia4j.include1=com.informatica.test.*::foo.*~~ENTRY=>VALUES
+
+# traces entry of matching methods but without values (incase value contains sensitive information such as passwords)
+#ia4j.include1b=com.informatica.test.*::foo.*~~ENTRY=>NOVALUES
+
+# traces arguments for return value and stack on exit of mathcing methods
+#ia4j.include2=com.informatica.test.*::bar.*~~EXIT=>VALUES~~EXIT=>STACK
+
+# logs the exception and stack when thrown by matching methods
+#ia4j.includeA=com.compactsolutionsllc.cdimc.informatica.xmlreader.converters.connection.SourceTargetConnectionResolver::getTargetsForInstance~~EXCEPTION=>HEAP~~ENTRY=>STACK~~ENTRY=>THREADS
+
+# Collects thread dump if matching method takes more than 10 seconds
+#ia4j.include4=com.informatica.test.*::bar.*~~TIMED(10)=>THREADS
+
+# Collects heap dump (and thread dump implicitly) if matching method takes more than 60 seconds, and for every 30 seconds until after that until method exits
+#ia4j.include5=com.informatica.test.*::bar.*~~TIMED(60,30)=>HEAP
+
+# Triggers pstack on this process when method takes more than 60 seconds to complete
+#ia4j.include6=com.informatica.test.*::bar.*~~TIMED(60)=>CMD{pstack $IA4J_PID >> pstack.output &}
+
+# Executes the specified script/command if the specified line number is reached in the matching method (both line number and method needs to be specified)
+#ia4j.include7=com.informatica.test.*::bar.*~~ATLINE(200)=>CMD{/tmp/collectdata.sh}
+
+# log value of an event at line xxx based on a custom condition 
+#ia4j.include8=com.informatica.test.*::bar.*~~ATLINE(200)=>CUSTOM{ if(errors.size() > 0) { TRACE(("" + errors));} }
+
+# Collect heap dump at line xxx based on a custom condition 
+#ia4j.include9=com.compactsolutionsllc.cdimc.app.modules.impl.ModuleParameterType::convert.ModuleParameterType ~~ATLINE(54)=>CUSTOM{ if(errors.size() > 0) { HEAP } }
+
+# Collect thread dump at specific line
+#ia4j.include9=com.informatica.test.*::bar.*~~ATLINE(200)=>CUSTOM{ THREADS; }
+
+# Inject sleep at specifid line number on a custom condition
+#ia4j.include9=com.informatica.test.*::bar.*~~ATLINE(200)=>CUSTOM{ if(errors.size() > 0) { Thread.sleep(10000l);} }
+
+# Fake an exception at specifid line number on a custom condition (to test behavior)
+#ia4j.include9=com.informatica.test.*::bar.*~~ATLINE(200)=>UNSAFECUSTOM{ if(errors.size() > 0) { throw new java.io.IOException("this is a dummy io exception"); } }
+
+#Need to apply a class file at runtime
+#ia4j.include10=com.informatica.test.ClassName::.*~~CLSFILE=>FILE{/path/to/ClassName.class}
+#ia4j.include101=com.informatica.test.ClassName::.*~~CLSFILE=>FILE{C:\\path\\to\\ClassName$Innerclass.class}
+
+#Example for inner class 
+#ia4j.include11=com.informatica.test.ClassName\$InnerClassName::foo~~EVENT=>ACTION
+
+#Example for CONDITIONALHEAP
+#ia4j.include5=com.informatica.test.ClassName::methodname~~ATLINE(98)=>CONDITIONALHEAP{"com.informatica.test.AnotherClassName(AnotherClassName.java:123)"}
+
+# Exclude methods from instrumentation
+# You only need to specify class::method filter
+
+#ia4j.includeA=com.compactsolutionsllc.cdimc.informatica.xmlreader.converters.connection.SourceTargetConnectionResolver::getTargetsForInstance~~ATLINE(50)=>HEAP~~ATLINE(50)=>STACK~~ATLINE(50)=>THREADS
+
+
